@@ -1,0 +1,35 @@
+{
+	"container": {
+		"volumes": [],
+		"docker": {
+			"parameters": [
+				{
+					"key": "C",
+					"value": "1"
+				},
+				{
+					"key": "D",
+					"value": "2"
+				},
+				{
+					"key": "E",
+					"value": "3"
+				}
+			]
+		}
+	},
+	"env": {
+		"C": "1",
+		"D": "2",
+		"E": "3"
+	},
+	"secrets": {
+		"pullConfigSecret": {
+			"source": "/mesos-docker/pullConfig"
+		}
+	},
+	"cpus": 0.5,
+	"disk": 0,
+	"instances": 1,
+	"mem": 128
+}
