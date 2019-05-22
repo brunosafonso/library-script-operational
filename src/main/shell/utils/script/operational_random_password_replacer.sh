@@ -48,7 +48,7 @@ while :; do
 			;;
 
 		# Unkown option.
-		-?*)
+		?*)
 			printf 'WARN: Unknown option (ignored): %s\n' "${1}" >&2
 			;;
 
@@ -77,6 +77,6 @@ ${DEBUG} && echo "PASSWORD_FILE=${PASSWORD_FILE}"
 while grep -q "${REPLACE_PATTERN}" ${PASSWORD_FILE}
 do
 	# Generates a new password and replaces it in the file.
-	sed -i "0,/${REPLACE_PATTERN}/{s/${REPLACE_PATTERN}/`./random_password.sh`/}" ${PASSWORD_FILE}
+	sed -i "0,/${REPLACE_PATTERN}/{s/${REPLACE_PATTERN}/`./operational_random_password.sh`/}" ${PASSWORD_FILE}
 done
 
