@@ -8,6 +8,10 @@ set -o errexit
 DEBUG=false
 DEBUG_OPT=
 
+# Default parameters.
+PASSWORD_PATTERN="a-zA-Z0-9"
+PASSWORD_SIZE=13
+
 # For each argument.
 while :; do
 	case ${1} in
@@ -18,8 +22,20 @@ while :; do
 			DEBUG_OPT="--debug"
 			;;
 
+		# Random password pattern.
+		-p|--pattern)
+			PASSWORD_PATTERN=${2}
+			shift
+			;;
+
+		# Random password size.
+		-s|--size)
+			PASSWORD_SIZE=${2}
+			shift
+			;;
+
 		# Unkown option.
-		-?*)
+		?*)
 			printf 'WARN: Unknown option (ignored): %s\n' "${1}" >&2
 			;;
 
@@ -38,18 +54,10 @@ set -o nounset
 trap - INT TERM
 
 # Print arguments if on debug mode.
-${DEBUG} && echo  "Running 'production_setup.sh'"
-
-# Sets up AWS. TODO
-
-# Sets up DCOS. TODO
-
-# Sets up AWS Route53. TODO
-
-# Login to DCOS and create admin user. TODO
-
-# Create internal access control service. TODO
+${DEBUG} && echo  "Running 'random_password'"
+${DEBUG} && echo  "PASSWORD_PATTERN=${PASSWORD_PATTERN}"
+${DEBUG} && echo  "PASSWORD_SIZE=${PASSWORD_SIZE}"
 
 
-
-
+# Runs the random password.
+head /dev/urandom | tr -dc "${PASSWORD_PATTERN}" | head -c ${PASSWORD_SIZE}

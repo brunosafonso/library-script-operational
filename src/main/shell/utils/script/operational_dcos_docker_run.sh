@@ -4,13 +4,13 @@
 set -o errexit
 #set -o pipefail
 
-# Debug is disabled by default.
+# Default parameters.
 DEBUG=false
 DEBUG_OPT=
-
-# Default parameters.
+DETACH_OPT=-d
 PROFILE_DIR=
 DOCKER_OPTIONS=
+CMD=
 
 # For each.
 while :; do
@@ -40,15 +40,20 @@ while :; do
 			shift
 			;;
 
+		# Attached docker option.
+		-a|--docker-attached)
+			DETACH_OPT=
+			;;
+
 		# Docker options.
 		-o|--docker-options)
 			DOCKER_OPTIONS=${2}
 			shift
 			;;
 
-		# Unkown option.
-		-?*)
-			printf 'WARN: Unknown option (ignored): %s\n' "${1}" >&2
+		# Other option.
+		?*)
+			CMD="${CMD} ${1}"
 			;;
 
 		# No more options.
@@ -93,31 +98,20 @@ IMAGE_NAME="`jq -r '.container.docker.image' <<EOF
 ${SERVICE_CONFIG}
 EOF
 `"
+# Environment variables.
 ENV_VARIABLES=""
-for ENV_VARIABLE in `jq -r '.env | keys[]' <<EOF
+for ENV_VARIABLE in `jq -c -r '.env | keys[]' <<EOF
 ${SERVICE_CONFIG}
 EOF
 `
 do
-	ENV_VARIABLES="${ENV_VARIABLES} -e ${ENV_VARIABLE}=`jq \".env.${ENV_VARIABLE}\" <<EOF
+	ENV_VARIABLES="${ENV_VARIABLES} -e ${ENV_VARIABLE}=`jq -r \".env.${ENV_VARIABLE}\" <<EOF
 ${SERVICE_CONFIG}
 EOF
 `"
 done
-PORT_MAPPINGS=""
-for PORT_MAPPING in `jq -c '.container.portMappings[]' <<EOF
-${SERVICE_CONFIG}
-EOF
-`
-do
-	PORT_MAPPINGS="${PORT_MAPPINGS} -p `jq -r .hostPort'' <<EOF
-${PORT_MAPPING}
-EOF
-`:`jq -r '.containerPort'<<EOF
-${PORT_MAPPING}
-EOF
-`"
-done
+
+# Resources.
 RESOURCES_LIMIT="--memory=`jq -r '.mem'<<EOF
 ${SERVICE_CONFIG}
 EOF
@@ -126,8 +120,25 @@ ${SERVICE_CONFIG}
 EOF
 `"
 
+# Docker parameters.
+PARAMS=""
+for PARAM in `jq -c '.container.docker.parameters[]' <<EOF
+${SERVICE_CONFIG}
+EOF
+`
+do
+	PARAMS="${PARAMS} --`jq -r '.key' <<EOF
+${PARAM}
+EOF
+` `jq -r '.value' <<EOF
+${PARAM}
+EOF
+`"
+done
+
+
 # Runs the docker command.
-${DEBUG} && echo "docker run ${CONTAINER_NAME} ${ENV_VARIABLES} ${PORT_MAPPINGS} ${RESOURCES_LIMIT} -d ${IMAGE_NAME}"
-docker run ${CONTAINER_NAME} ${ENV_VARIABLES} ${PORT_MAPPINGS} ${RESOURCES_LIMIT} ${DOCKER_OPTIONS} -d ${IMAGE_NAME}
+${DEBUG} && echo "docker run ${CONTAINER_NAME} ${ENV_VARIABLES} ${RESOURCES_LIMIT} ${PARAMS} ${DOCKER_OPTIONS} ${DETACH_OPT} ${IMAGE_NAME} ${CMD}"
+docker run ${CONTAINER_NAME} ${ENV_VARIABLES} ${RESOURCES_LIMIT} ${PARAMS} ${DOCKER_OPTIONS} ${DETACH_OPT} ${IMAGE_NAME} ${CMD}
 
 
