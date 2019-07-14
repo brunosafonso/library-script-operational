@@ -4,11 +4,9 @@
 set -o errexit
 #set -o pipefail
 
-# Debug is disabled by default.
+# Default parameters.
 DEBUG=false
 DEBUG_OPT=
-
-# Default parameters.
 PASSWORD_PATTERN="a-zA-Z0-9"
 PASSWORD_SIZE=13
 REPLACE_PATTERN="{{ PASSWORD_WILDCARD }}"
@@ -77,6 +75,6 @@ ${DEBUG} && echo "PASSWORD_FILE=${PASSWORD_FILE}"
 while grep -q "${REPLACE_PATTERN}" ${PASSWORD_FILE}
 do
 	# Generates a new password and replaces it in the file.
-	sed -i "0,/${REPLACE_PATTERN}/{s/${REPLACE_PATTERN}/`./operational_random_password.sh`/}" ${PASSWORD_FILE}
+	sed -i "0,/${REPLACE_PATTERN}/{s/${REPLACE_PATTERN}/`./operational_utils_random_password.sh`/}" ${PASSWORD_FILE}
 done
 

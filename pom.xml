@@ -7,23 +7,23 @@
 	<parent>
 		<groupId>org.coldis</groupId>
 		<artifactId>configuration</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.3</version>
 	</parent>
 
-	<groupId>org.coldis.infrastructure</groupId>
-	<artifactId>utils-operational</artifactId>
+	<groupId>org.coldis.library</groupId>
+	<artifactId>script-operational</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Infrastucture operational utilities</name>
+	<name>Operational scripts</name>
 
 	<properties>
 	</properties>
 
 	<scm>
-		<url>https://github.com/coldis-org/infrastructure-utils-operational</url>
-		<connection>scm:git:https://github.com/coldis-org/infrastructure-utils-operational.git</connection>
-		<developerConnection>scm:git:git@github.com:coldis-org/infrastructure-utils-operational.git</developerConnection>
+		<url>https://github.com/coldis-org/library-script-operational</url>
+		<connection>scm:git:https://github.com/coldis-org/library-script-operational.git</connection>
+		<developerConnection>scm:git:git@github.com:coldis-org/library-script-operational.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
@@ -31,5 +31,13 @@
 
 
 	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/shell</directory>
+			</resource>
+		</resources>
+	</build>
 
 </project>
