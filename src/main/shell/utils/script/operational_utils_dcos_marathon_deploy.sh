@@ -103,7 +103,7 @@ do
 		export ${ENV_VARIABLE}
 	done
 	${DEBUG} && echo "Exporting ariable CLI_CONTAINER=${CLI_CONTAINER} for scripts."
-	export ${CLI_CONTAINER}
+	export CLI_CONTAINER
 
 	# If there is a pre deploy script.
 	if [ -f ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT} ]
