@@ -122,8 +122,8 @@ do
 		# Deploys the module.
 		${DEBUG} && echo "docker exec -i ${CLI_CONTAINER} \
 			dcos_deploy_marathon ${DEBUG_OPT} < ${CURRENT_MODULE_SERVICE_CONFIG}"
-#		docker exec -i ${CLI_CONTAINER} \
-#			dcos_deploy_marathon ${DEBUG_OPT} < ${CURRENT_MODULE_SERVICE_CONFIG}
+		docker exec -i ${CLI_CONTAINER} \
+			dcos_deploy_marathon ${DEBUG_OPT} < ${CURRENT_MODULE_SERVICE_CONFIG}
 		
 	fi
 	
