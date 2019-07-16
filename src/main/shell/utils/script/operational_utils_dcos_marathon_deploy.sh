@@ -99,9 +99,11 @@ do
 	for ENV_VARIABLE in `cat ${CURRENT_MODULE_SERVICE_CONFIG} | jq -c -r '.env | keys[]'`
 	do
 		ENV_VARIABLE_VALUE="`cat ${CURRENT_MODULE_SERVICE_CONFIG} | jq -r ".env.${ENV_VARIABLE}"`"
-			${DEBUG} && echo "Exporting ariable ${ENV_VARIABLE}=${ENV_VARIABLE_VALUE} for scripts."
+		${DEBUG} && echo "Exporting ariable ${ENV_VARIABLE}=${ENV_VARIABLE_VALUE} for scripts."
 		export ${ENV_VARIABLE}
 	done
+	${DEBUG} && echo "Exporting ariable CLI_CONTAINER=${CLI_CONTAINER} for scripts."
+	export ${CLI_CONTAINER}
 
 	# If there is a pre deploy script.
 	if [ -f ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT} ]
