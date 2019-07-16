@@ -90,53 +90,30 @@ else
 fi
 
 # Gets the docker container config.
-CONTAINER_NAME="--name `jq -r '.id' <<EOF
-${SERVICE_CONFIG}
-EOF
-`"
-IMAGE_NAME="`jq -r '.container.docker.image' <<EOF
-${SERVICE_CONFIG}
-EOF
-`"
+CONTAINER_NAME="--name `echo ${SERVICE_CONFIG} | jq -r '.id'`"
+IMAGE_NAME="`echo ${SERVICE_CONFIG} | jq -r '.container.docker.image'`"
+
 # Environment variables.
 ENV_VARIABLES=""
-for ENV_VARIABLE in `jq -c -r '.env | keys[]' <<EOF
-${SERVICE_CONFIG}
-EOF
-`
+for ENV_VARIABLE in `echo ${SERVICE_CONFIG} | jq -c -r '.env | keys[]'`
 do
-	ENV_VARIABLES="${ENV_VARIABLES} -e ${ENV_VARIABLE}=`jq -r \".env.${ENV_VARIABLE}\" <<EOF
-${SERVICE_CONFIG}
-EOF
-`"
+	ENV_VARIABLES="${ENV_VARIABLES} -e '${ENV_VARIABLE}=`echo ${SERVICE_CONFIG} | \
+	jq -r ".env.${ENV_VARIABLE}"`'"
 done
 
 # Resources.
-RESOURCES_LIMIT="--memory=`jq -r '.mem'<<EOF
-${SERVICE_CONFIG}
-EOF
-`M --cpus=`jq -r '.cpus' <<EOF
-${SERVICE_CONFIG}
-EOF
-`"
+RESOURCES_LIMIT="--memory=`echo ${SERVICE_CONFIG} | jq -r '.mem'`\
+M --cpus=`echo ${SERVICE_CONFIG} | jq -r '.cpus'`"
 
 # Docker parameters.
 PARAMS=""
-for PARAM in `jq -c '.container.docker.parameters[]' <<EOF
-${SERVICE_CONFIG}
-EOF
-`
+for PARAM in `echo ${SERVICE_CONFIG} | jq -c '.container.docker.parameters[]'`
 do
-	PARAMS="${PARAMS} --`jq -r '.key' <<EOF
-${PARAM}
-EOF
-` `jq -r '.value' <<EOF
-${PARAM}
-EOF
-`"
+	PARAMS="${PARAMS} --`echo ${PARAM} | jq -r '.key'` `echo ${PARAM} | jq -r '.value'`"
 done
 
-
 # Runs the docker command.
-${DEBUG} && echo "docker run ${CONTAINER_NAME} ${ENV_VARIABLES} ${RESOURCES_LIMIT} ${PARAMS} ${DOCKER_OPTIONS} ${DETACH_OPT} ${IMAGE_NAME} ${CMD}"
-docker run ${CONTAINER_NAME} ${ENV_VARIABLES} ${RESOURCES_LIMIT} ${PARAMS} ${DOCKER_OPTIONS} ${DETACH_OPT} ${IMAGE_NAME} ${CMD}
+${DEBUG} && echo "docker run ${CONTAINER_NAME} ${ENV_VARIABLES} \
+	${RESOURCES_LIMIT} ${PARAMS} ${DOCKER_OPTIONS} ${DETACH_OPT} ${IMAGE_NAME} ${CMD}"
+docker run ${CONTAINER_NAME} ${ENV_VARIABLES} \
+	${RESOURCES_LIMIT} ${PARAMS} ${DOCKER_OPTIONS} ${DETACH_OPT} ${IMAGE_NAME} ${CMD}
