@@ -71,11 +71,11 @@ set -o nounset
 trap - INT TERM
 
 # Print arguments if on debug mode.
-${DEBUG} && echo  "Running 'dcos-docker-run'"
-${DEBUG} && echo  "SERVICE_CONFIG_DIR=${SERVICE_CONFIG_DIR}"
-${DEBUG} && echo  "SERVICE_CONFIG_FILE=${SERVICE_CONFIG_FILE}"
-${DEBUG} && echo  "PROFILE_DIR=${PROFILE_DIR}"
-${DEBUG} && echo  "DOCKER_OPTIONS=${DOCKER_OPTIONS}"
+${DEBUG} && echo "Running 'dcos-docker-run'"
+${DEBUG} && echo "SERVICE_CONFIG_DIR=${SERVICE_CONFIG_DIR}"
+${DEBUG} && echo "SERVICE_CONFIG_FILE=${SERVICE_CONFIG_FILE}"
+${DEBUG} && echo "PROFILE_DIR=${PROFILE_DIR}"
+${DEBUG} && echo "DOCKER_OPTIONS=${DOCKER_OPTIONS}"
 
 # If no profile is set.
 if [ "${PROFILE_DIR}" = "" ]
