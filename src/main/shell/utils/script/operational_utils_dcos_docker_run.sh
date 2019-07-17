@@ -9,6 +9,7 @@ DEBUG=false
 DEBUG_OPT=
 DETACH_OPT=-d
 PROFILE_DIR=
+ENV_TEMP_FILE=temp-env.properties
 DOCKER_OPTIONS=
 CMD=
 
@@ -94,11 +95,11 @@ CONTAINER_NAME="--name `echo ${SERVICE_CONFIG} | jq -r '.id'`"
 IMAGE_NAME="`echo ${SERVICE_CONFIG} | jq -r '.container.docker.image'`"
 
 # Environment variables.
-ENV_VARIABLES=""
+rm -f ${SERVICE_CONFIG_DIR}/${ENV_TEMP_FILE}
 for ENV_VARIABLE in `echo ${SERVICE_CONFIG} | jq -c -r '.env | keys[]'`
 do
-	ENV_VARIABLES="${ENV_VARIABLES} -e '${ENV_VARIABLE}=`echo ${SERVICE_CONFIG} | \
-	jq -r ".env.${ENV_VARIABLE}"`'"
+	echo "${ENV_VARIABLE}=`echo ${SERVICE_CONFIG} | \
+		jq -r ".env.${ENV_VARIABLE}"`" >> ${SERVICE_CONFIG_DIR}/${ENV_TEMP_FILE}
 done
 
 # Resources.
@@ -113,7 +114,7 @@ do
 done
 
 # Runs the docker command.
-${DEBUG} && echo "docker run ${CONTAINER_NAME} ${ENV_VARIABLES} \
+${DEBUG} && echo "docker run ${CONTAINER_NAME} --env-file ${SERVICE_CONFIG_DIR}/${ENV_TEMP_FILE} \
 	${RESOURCES_LIMIT} ${PARAMS} ${DOCKER_OPTIONS} ${DETACH_OPT} ${IMAGE_NAME} ${CMD}"
-docker run ${CONTAINER_NAME} ${ENV_VARIABLES} \
+docker run ${CONTAINER_NAME} --env-file ${SERVICE_CONFIG_DIR}/${ENV_TEMP_FILE} \
 	${RESOURCES_LIMIT} ${PARAMS} ${DOCKER_OPTIONS} ${DETACH_OPT} ${IMAGE_NAME} ${CMD}
