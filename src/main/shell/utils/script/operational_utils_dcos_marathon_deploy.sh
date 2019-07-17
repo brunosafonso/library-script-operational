@@ -74,7 +74,10 @@ trap - INT TERM
 # Print arguments if on debug mode.
 ${DEBUG} && echo "Running 'operational_utils_dcos_marathon_deploy'"
 ${DEBUG} && echo "BASE_DIRECTORY=${BASE_DIRECTORY}"
+${DEBUG} && echo "MODULES_FILE=${MODULES_FILE}"
 ${DEBUG} && echo "SERVICE_CONFIG_FILE=${SERVICE_CONFIG_FILE}"
+${DEBUG} && echo "PROFILE_DIRECTORY=${PROFILE_DIRECTORY}"
+${DEBUG} && echo "CLI_CONTAINER=${CLI_CONTAINER}"
 
 # For each child directory.
 for CURRENT_MODULE in `jq -rc ".[]" ${BASE_DIRECTORY}/${MODULES_FILE}`
@@ -132,7 +135,7 @@ do
 	then
 	
 		# If no profile is set.
-		if [ "${PROFILE_DIR}" = "" ]
+		if [ "${PROFILE_DIRECTORY}" = "" ]
 		then
 			# The temporary service config is the original one.
 			cp ${CURRENT_MODULE_SERVICE_CONFIG} ${TEMP_SERVICE_CONFIG_FILE}
