@@ -7,15 +7,13 @@ set -o errexit
 # Default parameters.
 DEBUG=false
 DEBUG_OPT=
+DCOS_CLI_CONTAINER=
 MODULES_FILE=modules.json
 SERVICE_CONFIG_FILE=service.json
 TEMP_SERVICE_CONFIG_FILE=temp-service.json
 PROFILE_DIRECTORY=
 PRE_DEPLOY_SCRIPT=pre_deploy.sh
 POST_DEPLOY_SCRIPT=post_deploy.sh
-DOCKER_OPTIONS=
-VERSION=latest
-PUSH=false
 
 # For each.
 while :; do
@@ -25,6 +23,12 @@ while :; do
 		--debug)
 			DEBUG=true
 			DEBUG_OPT="--debug"
+			;;
+
+		# DCOS CLI container name.
+		-c|--cli-container)
+			CLI_CONTAINER=${2}
+			shift
 			;;
 
 		# Base directory for modules.
@@ -48,12 +52,6 @@ while :; do
 		# Profile directory.
 		-p|--profile)
 			PROFILE_DIRECTORY=${2}
-			shift
-			;;
-
-		# DCOS CLI container name.
-		-c|--cli-container)
-			CLI_CONTAINER=${2}
 			shift
 			;;
 
@@ -146,11 +144,24 @@ do
 				${PROFILE_DIRECTORY}/${CURRENT_MODULE_SERVICE_CONFIG} > ${TEMP_SERVICE_CONFIG_FILE}
 		fi
 	
-		# Deploys the module.
-		${DEBUG} && echo "docker exec -i ${CLI_CONTAINER} \
-			dcos_deploy_marathon ${DEBUG_OPT} < ${TEMP_SERVICE_CONFIG_FILE}"
-		docker exec -i ${CLI_CONTAINER} \
+		# If the dcos_deploy_marathon is available.
+		if command -v dcos_deploy_marathon
+		then
+		
+			# Deploys the module.
+			${DEBUG} && echo "dcos_deploy_marathon ${DEBUG_OPT} < ${TEMP_SERVICE_CONFIG_FILE}"
 			dcos_deploy_marathon ${DEBUG_OPT} < ${TEMP_SERVICE_CONFIG_FILE}
+		
+		# If the dcos_deploy_marathon is not available.
+		else 
+		
+			# Deploys the module.
+			${DEBUG} && echo "docker exec -i ${CLI_CONTAINER} \
+				dcos_deploy_marathon ${DEBUG_OPT} < ${TEMP_SERVICE_CONFIG_FILE}"
+			docker exec -i ${CLI_CONTAINER} \
+				dcos_deploy_marathon ${DEBUG_OPT} < ${TEMP_SERVICE_CONFIG_FILE}
+		
+		fi
 			
 		# Removes the temporary.
 		rm -f ${TEMP_SERVICE_CONFIG_FILE}
