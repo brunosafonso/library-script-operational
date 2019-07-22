@@ -185,7 +185,7 @@ do
 		
 			# Deploys the module.
 			${DEBUG} && echo "${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} < ${TEMP_SERVICE_CONFIG_FILE}"
-#			${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} < ${TEMP_SERVICE_CONFIG_FILE}
+			${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} < ${TEMP_SERVICE_CONFIG_FILE}
 				
 			# Removes the temporary.
 			rm -f ${TEMP_SERVICE_CONFIG_FILE}
