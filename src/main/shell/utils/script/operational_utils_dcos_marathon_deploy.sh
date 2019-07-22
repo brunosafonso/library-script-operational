@@ -157,13 +157,13 @@ do
 			fi
 
 			# Exports variables to scripts.
-			for ENV_VARIABLE in `cat ${TEMP_SERVICE_CONFIG_FILE} | jq -c -r '.env | keys[]'`
+			for ENV_VARIABLE_NAME in `cat ${TEMP_SERVICE_CONFIG_FILE} | jq -c -r '.env | keys[]'`
 			do
-				ENV_VARIABLE_VALUE="`cat ${TEMP_SERVICE_CONFIG_FILE} | jq -r ".env.${ENV_VARIABLE}"`"
-				${DEBUG} && echo "Exporting ariable ${ENV_VARIABLE}=${ENV_VARIABLE_VALUE} for scripts."
-				export ${ENV_VARIABLE}
+				ENV_VARIABLE_VALUE="`cat ${TEMP_SERVICE_CONFIG_FILE} | jq -r ".env.${ENV_VARIABLE_NAME}"`"
+				${DEBUG} && echo "Exporting variable ${ENV_VARIABLE_NAME}=${ENV_VARIABLE_VALUE} for scripts."
+				export ${ENV_VARIABLE_NAME}=${ENV_VARIABLE_VALUE}
 			done
-			${DEBUG} && echo "Exporting ariable CLI_CONTAINER=${CLI_CONTAINER} for scripts."
+			${DEBUG} && echo "Exporting variable CLI_CONTAINER=${CLI_CONTAINER} for scripts."
 			export CLI_CONTAINER
 			
 		fi
