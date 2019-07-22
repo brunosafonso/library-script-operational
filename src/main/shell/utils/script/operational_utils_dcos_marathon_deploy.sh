@@ -161,7 +161,7 @@ do
 			do
 				ENV_VARIABLE_VALUE="`cat ${TEMP_SERVICE_CONFIG_FILE} | jq -r ".env.${ENV_VARIABLE_NAME}"`"
 				${DEBUG} && echo "Exporting variable ${ENV_VARIABLE_NAME}=${ENV_VARIABLE_VALUE} for scripts."
-				export ${ENV_VARIABLE_NAME}=${ENV_VARIABLE_VALUE}
+				export ${ENV_VARIABLE_NAME}="${ENV_VARIABLE_VALUE}"
 			done
 			${DEBUG} && echo "Exporting variable CLI_CONTAINER=${CLI_CONTAINER} for scripts."
 			export CLI_CONTAINER
