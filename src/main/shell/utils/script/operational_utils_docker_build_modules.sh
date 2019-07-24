@@ -10,6 +10,7 @@ DEBUG_OPT=
 SERVICE_CONFIG_FILE=service.json
 DOCKER_OPTIONS=
 VERSION=latest
+PULL="--pull"
 PUSH=false
 
 # For each.
@@ -38,6 +39,11 @@ while :; do
 		-o|--docker-options)
 			DOCKER_OPTIONS=${2}
 			shift
+			;;
+			
+		# If pull should not be forced.
+		--dont-pull)
+			PULL=
 			;;
 			
 		# If image should be pushed.
@@ -88,7 +94,7 @@ do
 		
 		# Builds the current module.
 		${DEBUG} && echo "Building module ${MODULE_DOCKER_IMAGE}"
-		docker ${DOCKER_OPTIONS} build -t ${MODULE_DOCKER_IMAGE}:${VERSION} ${CURRENT_MODULE_DIRECTORY}
+		docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} ${CURRENT_MODULE_DIRECTORY}
 		
 		# If push should also be made.
 		if ${PUSH}
