@@ -173,7 +173,7 @@ do
 			# Runs the pre deploy script.
 			${DEBUG} && echo "Running ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT}"
 			chmod +x ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT} || true
-			${CURRENT_MODULE_PRE_DEPLOY_SCRIPT}
+			./${CURRENT_MODULE_PRE_DEPLOY_SCRIPT}
 		
 		fi
 			
@@ -197,7 +197,7 @@ do
 			# Runs the post deploy script.
 			${DEBUG} && echo "Running ${CURRENT_MODULE_POST_DEPLOY_SCRIPT}"
 			chmod +x ${CURRENT_MODULE_POST_DEPLOY_SCRIPT} || true
-			${CURRENT_MODULE_POST_DEPLOY_SCRIPT}
+			./${CURRENT_MODULE_POST_DEPLOY_SCRIPT}
 		
 		fi
 		
