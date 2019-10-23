@@ -1,0 +1,59 @@
+{
+  "id": "access-control-service-ldap",
+  "container": {
+    "portMappings": [
+      {
+        "containerPort": 80,
+        "hostPort": 0,
+        "servicePort": 10000
+      }
+    ],
+    "type": "DOCKER",
+    "volumes": [],
+    "docker": {
+      "image": "nginx",
+      "forcePullImage": false,
+      "pullConfig": {
+        "secret": "pullConfigSecret"
+      },
+      "parameters": [
+        {
+          "key": "C",
+          "value": "1"
+        },
+        {
+          "key": "D",
+          "value": "2"
+        },
+        {
+          "key": "E",
+          "value": "3"
+        }
+      ]
+    }
+  },
+  "env": {
+    "A": "1",
+    "B": "2",
+    "C": "1",
+    "D": "2",
+    "E": "3",
+    "a.b.c": "4"
+  },
+  "secrets": {
+    "pullConfigSecret": {
+      "source": "/mesos-docker/pullConfig"
+    }
+  },
+  "args": [],
+  "cpus": 0.5,
+  "disk": 0,
+  "instances": 1,
+  "mem": 128,
+  "networks": [
+    {
+      "mode": "container/bridge"
+    }
+  ],
+  "requirePorts": false
+}

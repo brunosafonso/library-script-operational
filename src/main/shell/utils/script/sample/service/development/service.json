@@ -21,7 +21,8 @@
 	"env": {
 		"C": "1",
 		"D": "2",
-		"E": "3"
+		"E": "3",
+		"a.b.c": "4"
 	},
 	"secrets": {
 		"pullConfigSecret": {

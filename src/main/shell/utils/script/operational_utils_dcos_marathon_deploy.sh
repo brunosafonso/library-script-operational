@@ -32,7 +32,7 @@ while :; do
 			CLI_CONTAINER=${2}
 			shift
 			;;
-
+		
 		# Base directory for modules.
 		-d|--base-directory)
 			BASE_DIRECTORY=${2}
@@ -182,8 +182,10 @@ do
 		then
 		
 			# Deploys the module.
-			${DEBUG} && echo "${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} < ${TEMP_SERVICE_CONFIG_FILE}"
-			${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} < ${TEMP_SERVICE_CONFIG_FILE}
+			${DEBUG} && echo "${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} \
+				< ${TEMP_SERVICE_CONFIG_FILE}"
+			${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} \
+				< ${TEMP_SERVICE_CONFIG_FILE}
 				
 			# Removes the temporary.
 			rm -f ${TEMP_SERVICE_CONFIG_FILE}

@@ -7,6 +7,9 @@ set -o errexit
 # Default parameters.
 DEBUG=false
 DEBUG_OPT=
+MODULES_FILE=modules.json
+INCLUDE_MODULES=
+EXCLUDE_MODULES=
 SERVICE_CONFIG_FILE=service.json
 DOCKER_OPTIONS=
 VERSION=latest
@@ -32,6 +35,24 @@ while :; do
 		# Service config file.
 		-f|--service-config-file)
 			SERVICE_CONFIG_FILE=${2}
+			shift
+			;;
+			
+		# Modules file.
+		-m|--modules-file)
+			MODULES_FILE=${2}
+			shift
+			;;
+			
+		# Modules to deploy.
+		-i|--include-modules)
+			INCLUDE_MODULES=`echo "${2}" | sed -e "s/[,;$]/\n/g"`
+			shift
+			;;
+
+		# Modules not to deploy.
+		-e|--exclude-modules)
+			EXCLUDE_MODULES=`echo "${2}" | sed -e "s/[,;$]/\n/g"`
 			shift
 			;;
 
@@ -62,7 +83,7 @@ while :; do
 			break
 
 	esac 
-	shift
+	[ "${2}" = "" ] || shift
 done
 
 # Using unavaialble variables should fail the script.
@@ -80,32 +101,52 @@ ${DEBUG} && echo "PUSH=${PUSH}"
 ${DEBUG} && echo "VERSION=${VERSION}"
 
 # For each child directory.
-for CURRENT_MODULE_DIRECTORY in ${BASE_DIRECTORY}/*/
+for CURRENT_MODULE in `jq -rc ".[]" ${BASE_DIRECTORY}/${MODULES_FILE}`
 do
+
+	# Gets the module information.
+	${DEBUG} && echo "CURRENT_MODULE=${CURRENT_MODULE}"
+	CURRENT_MODULE_NAME=`echo ${CURRENT_MODULE} | jq -r ".name"`
+	${DEBUG} && echo "CURRENT_MODULE_NAME=${CURRENT_MODULE_NAME}"
+	CURRENT_MODULE_DIRECTORY=${BASE_DIRECTORY}/${CURRENT_MODULE_NAME}
+	${DEBUG} && echo "CURRENT_MODULE_DIRECTORY=${CURRENT_MODULE_DIRECTORY}"
 	
-	# If there is a service config.
-	if [ -f ${CURRENT_MODULE_DIRECTORY}/${SERVICE_CONFIG_FILE} ]
+	# If the module should be built.
+	if ([ -z "${INCLUDE_MODULES}" ] || \
+			echo "${INCLUDE_MODULES}" | grep "^${CURRENT_MODULE_NAME}$") && 
+		([ -z "${EXCLUDE_MODULES}" ] || \
+			! echo "${EXCLUDE_MODULES}" | grep "^${CURRENT_MODULE_NAME}$")
 	then
-	
-		# Gets the module name.
-		MODULE_DOCKER_IMAGE=`jq -r '.container.docker.image' \
-			< ${CURRENT_MODULE_DIRECTORY}/${SERVICE_CONFIG_FILE}`
-		MODULE_DOCKER_IMAGE=`echo ${MODULE_DOCKER_IMAGE} | sed "s/\(.*\):[^:]*/\1/"`
-		
-		# Builds the current module.
-		${DEBUG} && echo "Building module ${MODULE_DOCKER_IMAGE}"
-		docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} ${CURRENT_MODULE_DIRECTORY}
-		
-		# If push should also be made.
-		if ${PUSH}
+
+		# If there is a service config.
+		if [ -f ${CURRENT_MODULE_DIRECTORY}/${SERVICE_CONFIG_FILE} ]
 		then
 		
-			# Pushes the module.
-			${DEBUG} && echo "Pushing module ${MODULE_DOCKER_IMAGE}"
-			docker ${DOCKER_OPTIONS} push ${MODULE_DOCKER_IMAGE}:${VERSION}
-		
+			# Gets the module name.
+			MODULE_DOCKER_IMAGE=`jq -r '.container.docker.image' \
+				< ${CURRENT_MODULE_DIRECTORY}/${SERVICE_CONFIG_FILE}`
+			MODULE_DOCKER_IMAGE=`echo ${MODULE_DOCKER_IMAGE} | sed "s/\(.*\):[^:]*/\1/"`
+			
+			# Builds the current module.
+			${DEBUG} && echo "Building module ${MODULE_DOCKER_IMAGE}"
+			docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} ${CURRENT_MODULE_DIRECTORY}
+			
+			# If push should also be made.
+			if ${PUSH}
+			then
+			
+				# Pushes the module.
+				${DEBUG} && echo "Pushing module ${MODULE_DOCKER_IMAGE}"
+				docker ${DOCKER_OPTIONS} push ${MODULE_DOCKER_IMAGE}:${VERSION}
+			
+			fi
+			
 		fi
 		
+	# If the module should not be built.	
+	else 
+		# Logs it.
+		echo "Skipping module ${CURRENT_MODULE_NAME}"
 	fi
 	
 done
