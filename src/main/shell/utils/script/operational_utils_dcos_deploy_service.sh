@@ -81,7 +81,6 @@ while :; do
 		# Force deployment.
 		-f|--force)
 			FORCE_DEPLOYMENT=--force
-			shift
 			;;
 
 		# No more options.
