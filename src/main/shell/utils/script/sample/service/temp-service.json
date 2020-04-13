@@ -49,7 +49,7 @@
   "cpus": 0.5,
   "disk": 0,
   "instances": 1,
-  "mem": 128,
+  "mem": 256,
   "networks": [
     {
       "mode": "container/bridge"
