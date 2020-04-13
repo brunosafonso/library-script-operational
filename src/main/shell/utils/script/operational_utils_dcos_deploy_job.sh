@@ -13,9 +13,12 @@ INCLUDE_MODULES=
 EXCLUDE_MODULES=
 SERVICE_CONFIG_FILE=service.json
 TEMP_SERVICE_CONFIG_FILE=temp-service.json
+JOB_CONFIG_FILE=job.json
+TEMP_JOB_CONFIG_FILE=temp-job.json
 PROFILE_DIRECTORY=
 PRE_DEPLOY_SCRIPT=pre_deploy.sh
 POST_DEPLOY_SCRIPT=post_deploy.sh
+FORCE_DEPLOYMENT=
 
 # For each.
 while :; do
@@ -58,14 +61,26 @@ while :; do
 			;;
 
 		# Service config file.
-		-f|--service-config-file)
+		-s|--service-config-file)
 			SERVICE_CONFIG_FILE=${2}
+			shift
+			;;
+			
+		# Service config file.
+		-j|--job-config-file)
+			JOB_CONFIG_FILE=${2}
 			shift
 			;;
 			
 		# Profile directory.
 		-p|--profile)
 			PROFILE_DIRECTORY=${2}
+			shift
+			;;
+
+		# Force deployment.
+		-f|--force)
+			FORCE_DEPLOYMENT=--force
 			shift
 			;;
 
@@ -115,6 +130,8 @@ do
 	${DEBUG} && echo "CURRENT_MODULE_DIRECTORY=${CURRENT_MODULE_DIRECTORY}"
 	CURRENT_MODULE_SERVICE_CONFIG=${SERVICE_CONFIG_FILE}
 	${DEBUG} && echo "CURRENT_MODULE_SERVICE_CONFIG=${CURRENT_MODULE_SERVICE_CONFIG}"
+	CURRENT_MODULE_JOB_CONFIG=${JOB_CONFIG_FILE}
+	${DEBUG} && echo "CURRENT_MODULE_JOB_CONFIG=${CURRENT_MODULE_JOB_CONFIG}"
 	CURRENT_MODULE_PRE_DEPLOY_SCRIPT=`echo ${CURRENT_MODULE} | jq -r ".script.preDeploy"`
 	CURRENT_MODULE_PRE_DEPLOY_SCRIPT=`[ -z ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT} ] || \
 		[ "${CURRENT_MODULE_PRE_DEPLOY_SCRIPT}" = "null" ] && \
@@ -166,6 +183,34 @@ do
 			
 		fi
 	
+		# If there is a job config.
+		if [ -f ${CURRENT_MODULE_JOB_CONFIG} ]
+		then
+		
+			# If no profile is set.
+			if [ "${PROFILE_DIRECTORY}" = "" ]
+			then
+				# The temporary job config is the original one.
+				cp ${CURRENT_MODULE_JOB_CONFIG} ${TEMP_JOB_CONFIG_FILE}
+			# If a profile is set.
+			else 
+				# Merges the main file with the profile file into the temporary job file.
+				jq -s '.[0] * .[1]' ${CURRENT_MODULE_JOB_CONFIG} \
+					${PROFILE_DIRECTORY}/${CURRENT_MODULE_JOB_CONFIG} > ${TEMP_JOB_CONFIG_FILE}
+			fi
+
+			# Exports variables to scripts.
+			for ENV_VARIABLE_NAME in `cat ${TEMP_JOB_CONFIG_FILE} | jq -c -r '.env | keys[]'`
+			do
+				ENV_VARIABLE_VALUE="`cat ${TEMP_JOB_CONFIG_FILE} | jq -r ".env.${ENV_VARIABLE_NAME}"`"
+				${DEBUG} && echo "Exporting variable ${ENV_VARIABLE_NAME}=${ENV_VARIABLE_VALUE} for scripts."
+				export ${ENV_VARIABLE_NAME}="${ENV_VARIABLE_VALUE}"
+			done
+			${DEBUG} && echo "Exporting variable CLI_CONTAINER=${CLI_CONTAINER} for scripts."
+			export CLI_CONTAINER
+			
+		fi
+	
 		# If there is a pre deploy script.
 		if [ -f ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT} ]
 		then
@@ -184,11 +229,26 @@ do
 			# Deploys the module.
 			${DEBUG} && echo "${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} \
 				< ${TEMP_SERVICE_CONFIG_FILE}"
-			${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} \
+			${CONTAINER_RUN} dcos_deploy_marathon ${FORCE_DEPLOYMENT} ${DEBUG_OPT} \
 				< ${TEMP_SERVICE_CONFIG_FILE}
 				
 			# Removes the temporary.
 			rm -f ${TEMP_SERVICE_CONFIG_FILE}
+			
+		fi
+		
+		# If there is a job config.
+		if [ -f ${TEMP_JOB_CONFIG_FILE} ]
+		then
+		
+			# Deploys the module.
+			${DEBUG} && echo "${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} \
+				< ${TEMP_JOB_CONFIG_FILE}"
+			${CONTAINER_RUN} dcos_deploy_job ${DEBUG_OPT} \
+				< ${TEMP_JOB_CONFIG_FILE}
+				
+			# Removes the temporary.
+			rm -f ${TEMP_JOB_CONFIG_FILE}
 			
 		fi
 		
