@@ -11,6 +11,7 @@ MODULES_FILE=modules.json
 INCLUDE_MODULES=
 EXCLUDE_MODULES=
 SERVICE_CONFIG_FILE=service.json
+JOB_CONFIG_FILE=service.json
 DOCKER_OPTIONS=
 VERSION=latest
 PULL="--pull"
@@ -33,8 +34,14 @@ while :; do
 			;;
 
 		# Service config file.
-		-f|--service-config-file)
+		-s|--service-config-file)
 			SERVICE_CONFIG_FILE=${2}
+			shift
+			;;
+			
+		# Service config file.
+		-j|--job-config-file)
+			JOB_CONFIG_FILE=${2}
 			shift
 			;;
 			
@@ -96,6 +103,7 @@ trap - INT TERM
 ${DEBUG} && echo "Running 'dcos-docker-run'"
 ${DEBUG} && echo "BASE_DIRECTORY=${BASE_DIRECTORY}"
 ${DEBUG} && echo "SERVICE_CONFIG_FILE=${SERVICE_CONFIG_FILE}"
+${DEBUG} && echo "JOB_CONFIG_FILE=${JOB_CONFIG_FILE}"
 ${DEBUG} && echo "DOCKER_OPTIONS=${DOCKER_OPTIONS}"
 ${DEBUG} && echo "PUSH=${PUSH}"
 ${DEBUG} && echo "VERSION=${VERSION}"
@@ -125,6 +133,31 @@ do
 			# Gets the module name.
 			MODULE_DOCKER_IMAGE=`jq -r '.container.docker.image' \
 				< ${CURRENT_MODULE_DIRECTORY}/${SERVICE_CONFIG_FILE}`
+			MODULE_DOCKER_IMAGE=`echo ${MODULE_DOCKER_IMAGE} | sed "s/\(.*\):[^:]*/\1/"`
+			
+			# Builds the current module.
+			${DEBUG} && echo "Building module ${MODULE_DOCKER_IMAGE}"
+			docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} ${CURRENT_MODULE_DIRECTORY}
+			
+			# If push should also be made.
+			if ${PUSH}
+			then
+			
+				# Pushes the module.
+				${DEBUG} && echo "Pushing module ${MODULE_DOCKER_IMAGE}"
+				docker ${DOCKER_OPTIONS} push ${MODULE_DOCKER_IMAGE}:${VERSION}
+			
+			fi
+			
+		fi
+		
+		# If there is a job config.
+		if [ -f ${CURRENT_MODULE_DIRECTORY}/${JOB_CONFIG_FILE} ]
+		then
+		
+			# Gets the module name.
+			MODULE_DOCKER_IMAGE=`jq -r '.run.docker.image' \
+				< ${CURRENT_MODULE_DIRECTORY}/${JOB_CONFIG_FILE}`
 			MODULE_DOCKER_IMAGE=`echo ${MODULE_DOCKER_IMAGE} | sed "s/\(.*\):[^:]*/\1/"`
 			
 			# Builds the current module.
