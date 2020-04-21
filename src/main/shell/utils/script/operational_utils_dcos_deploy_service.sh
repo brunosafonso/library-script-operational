@@ -13,7 +13,7 @@ INCLUDE_MODULES=
 EXCLUDE_MODULES=
 SERVICE_CONFIG_FILE=service.json
 TEMP_SERVICE_CONFIG_FILE=temp-service.json
-JOB_CONFIG_FILE=job.json
+JOB_CONFIG_FILE=*job.json
 TEMP_JOB_CONFIG_FILE=temp-job.json
 PROFILE_DIRECTORY=
 PRE_DEPLOY_SCRIPT=pre_deploy.sh
@@ -184,19 +184,21 @@ do
 		fi
 	
 		# If there is a job config.
-		if [ -f ${CURRENT_MODULE_JOB_CONFIG} ]
-		then
+		for CURRENT_MODULE_CURRENT_JOB_CONFIG in ${CURRENT_MODULE_JOB_CONFIG}
+		do
+#		if [ -f ${CURRENT_MODULE_JOB_CONFIG} ]
+#		then
 		
 			# If no profile is set.
 			if [ "${PROFILE_DIRECTORY}" = "" ]
 			then
 				# The temporary job config is the original one.
-				cp ${CURRENT_MODULE_JOB_CONFIG} ${TEMP_JOB_CONFIG_FILE}
+				cp ${CURRENT_MODULE_CURRENT_JOB_CONFIG} ${TEMP_JOB_CONFIG_FILE}
 			# If a profile is set.
 			else 
 				# Merges the main file with the profile file into the temporary job file.
-				jq -s '.[0] * .[1]' ${CURRENT_MODULE_JOB_CONFIG} \
-					${PROFILE_DIRECTORY}/${CURRENT_MODULE_JOB_CONFIG} > ${TEMP_JOB_CONFIG_FILE}
+				jq -s '.[0] * .[1]' ${CURRENT_MODULE_CURRENT_JOB_CONFIG} \
+					${PROFILE_DIRECTORY}/${CURRENT_MODULE_CURRENT_JOB_CONFIG} > ${TEMP_JOB_CONFIG_FILE}
 			fi
 
 			# Exports variables to scripts.
@@ -208,8 +210,9 @@ do
 			done
 			${DEBUG} && echo "Exporting variable CLI_CONTAINER=${CLI_CONTAINER} for scripts."
 			export CLI_CONTAINER
-			
-		fi
+
+#		fi			
+		done
 	
 		# If there is a pre deploy script.
 		if [ -f ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT} ]
