@@ -155,6 +155,17 @@ do
 		# Goes to the module directory.
 		cd ${CURRENT_MODULE_DIRECTORY}
 		
+		# If there is a pre deploy script.
+		if [ -f ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT} ]
+		then
+		
+			# Runs the pre deploy script.
+			${DEBUG} && echo "Running ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT}"
+			chmod +x ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT} || true
+			./${CURRENT_MODULE_PRE_DEPLOY_SCRIPT}
+		
+		fi
+		
 		# If there is a service config.
 		if [ -f ${CURRENT_MODULE_SERVICE_CONFIG} ]
 		then
@@ -180,6 +191,21 @@ do
 			done
 			${DEBUG} && echo "Exporting variable CLI_CONTAINER=${CLI_CONTAINER} for scripts."
 			export CLI_CONTAINER
+			
+			# If there is a service config.
+			if [ -f ${TEMP_SERVICE_CONFIG_FILE} ]
+			then
+			
+				# Deploys the module.
+				${DEBUG} && echo "${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} \
+					< ${TEMP_SERVICE_CONFIG_FILE}"
+				${CONTAINER_RUN} dcos_deploy_marathon ${FORCE_DEPLOYMENT} ${DEBUG_OPT} \
+					< ${TEMP_SERVICE_CONFIG_FILE}
+					
+				# Removes the temporary.
+				rm -f ${TEMP_SERVICE_CONFIG_FILE}
+				
+			fi
 			
 		fi
 	
@@ -210,51 +236,25 @@ do
 			done
 			${DEBUG} && echo "Exporting variable CLI_CONTAINER=${CLI_CONTAINER} for scripts."
 			export CLI_CONTAINER
+			
+			# If there is a job config.
+			if [ -f ${TEMP_JOB_CONFIG_FILE} ]
+			then
+			
+				# Deploys the module.
+				${DEBUG} && echo "${CONTAINER_RUN} dcos_deploy_job ${DEBUG_OPT} \
+					< ${TEMP_JOB_CONFIG_FILE}"
+				${CONTAINER_RUN} dcos_deploy_job ${DEBUG_OPT} \
+					< ${TEMP_JOB_CONFIG_FILE}
+					
+				# Removes the temporary.
+				rm -f ${TEMP_JOB_CONFIG_FILE}
+				
+			fi
 
 #		fi			
 		done
 	
-		# If there is a pre deploy script.
-		if [ -f ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT} ]
-		then
-		
-			# Runs the pre deploy script.
-			${DEBUG} && echo "Running ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT}"
-			chmod +x ${CURRENT_MODULE_PRE_DEPLOY_SCRIPT} || true
-			./${CURRENT_MODULE_PRE_DEPLOY_SCRIPT}
-		
-		fi
-			
-		# If there is a service config.
-		if [ -f ${TEMP_SERVICE_CONFIG_FILE} ]
-		then
-		
-			# Deploys the module.
-			${DEBUG} && echo "${CONTAINER_RUN} dcos_deploy_marathon ${DEBUG_OPT} \
-				< ${TEMP_SERVICE_CONFIG_FILE}"
-			${CONTAINER_RUN} dcos_deploy_marathon ${FORCE_DEPLOYMENT} ${DEBUG_OPT} \
-				< ${TEMP_SERVICE_CONFIG_FILE}
-				
-			# Removes the temporary.
-			rm -f ${TEMP_SERVICE_CONFIG_FILE}
-			
-		fi
-		
-		# If there is a job config.
-		if [ -f ${TEMP_JOB_CONFIG_FILE} ]
-		then
-		
-			# Deploys the module.
-			${DEBUG} && echo "${CONTAINER_RUN} dcos_deploy_job ${DEBUG_OPT} \
-				< ${TEMP_JOB_CONFIG_FILE}"
-			${CONTAINER_RUN} dcos_deploy_job ${DEBUG_OPT} \
-				< ${TEMP_JOB_CONFIG_FILE}
-				
-			# Removes the temporary.
-			rm -f ${TEMP_JOB_CONFIG_FILE}
-			
-		fi
-		
 		# If there is a post deploy script.
 		if [ -f ${CURRENT_MODULE_POST_DEPLOY_SCRIPT} ]
 		then

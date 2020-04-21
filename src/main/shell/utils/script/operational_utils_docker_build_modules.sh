@@ -126,18 +126,21 @@ do
 			! echo "${EXCLUDE_MODULES}" | grep "^${CURRENT_MODULE_NAME}$")
 	then
 
+		# Goes to the module directory.
+		cd ${CURRENT_MODULE_DIRECTORY}
+
 		# If there is a service config.
-		if [ -f ${CURRENT_MODULE_DIRECTORY}/${SERVICE_CONFIG_FILE} ]
+		if [ -f ${SERVICE_CONFIG_FILE} ]
 		then
 		
 			# Gets the module name.
 			MODULE_DOCKER_IMAGE=`jq -r '.container.docker.image' \
-				< ${CURRENT_MODULE_DIRECTORY}/${SERVICE_CONFIG_FILE}`
+				< ${SERVICE_CONFIG_FILE}`
 			MODULE_DOCKER_IMAGE=`echo ${MODULE_DOCKER_IMAGE} | sed "s/\(.*\):[^:]*/\1/"`
 			
 			# Builds the current module.
 			${DEBUG} && echo "Building module ${MODULE_DOCKER_IMAGE}"
-			docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} ${CURRENT_MODULE_DIRECTORY}
+			docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} .
 			
 			# If push should also be made.
 			if ${PUSH}
@@ -152,17 +155,17 @@ do
 		fi
 		
 		# If there is a job config.
-		if [ -f ${CURRENT_MODULE_DIRECTORY}/${JOB_CONFIG_FILE} ]
+		if [ -f ${JOB_CONFIG_FILE} ]
 		then
 		
 			# Gets the module name.
 			MODULE_DOCKER_IMAGE=`jq -r '.run.docker.image' \
-				< ${CURRENT_MODULE_DIRECTORY}/${JOB_CONFIG_FILE}`
+				< ${JOB_CONFIG_FILE}`
 			MODULE_DOCKER_IMAGE=`echo ${MODULE_DOCKER_IMAGE} | sed "s/\(.*\):[^:]*/\1/"`
 			
 			# Builds the current module.
 			${DEBUG} && echo "Building module ${MODULE_DOCKER_IMAGE}"
-			docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} ${CURRENT_MODULE_DIRECTORY}
+			docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} .
 			
 			# If push should also be made.
 			if ${PUSH}
@@ -175,6 +178,9 @@ do
 			fi
 			
 		fi
+		
+		# Goes back to the base dir.
+		cd ..
 		
 	# If the module should not be built.	
 	else 
