@@ -11,7 +11,7 @@ MODULES_FILE=modules.json
 INCLUDE_MODULES=
 EXCLUDE_MODULES=
 SERVICE_CONFIG_FILE=service.json
-JOB_CONFIG_FILE=job.json
+JOB_CONFIG_FILE=*job.json
 DOCKER_OPTIONS=
 VERSION=latest
 PULL="--pull"
@@ -154,13 +154,16 @@ do
 			
 		fi
 		
+		# For each job config.
+		for CURRENT_MODULE_CURRENT_JOB_CONFIG in ${JOB_CONFIG_FILE}
+		do
 		# If there is a job config.
-		if [ -f ${JOB_CONFIG_FILE} ]
-		then
+		#if [ -f ${JOB_CONFIG_FILE} ]
+		#then
 		
 			# Gets the module name.
 			MODULE_DOCKER_IMAGE=`jq -r '.run.docker.image' \
-				< ${JOB_CONFIG_FILE}`
+				< ${CURRENT_MODULE_CURRENT_JOB_CONFIG}`
 			MODULE_DOCKER_IMAGE=`echo ${MODULE_DOCKER_IMAGE} | sed "s/\(.*\):[^:]*/\1/"`
 			
 			# Builds the current module.
@@ -177,7 +180,8 @@ do
 			
 			fi
 			
-		fi
+		#fi
+		done
 		
 		# Goes back to the base dir.
 		cd ..
