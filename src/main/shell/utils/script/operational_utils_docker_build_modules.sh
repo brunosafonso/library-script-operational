@@ -157,30 +157,30 @@ do
 		# For each job config.
 		for CURRENT_MODULE_CURRENT_JOB_CONFIG in ${JOB_CONFIG_FILE}
 		do
-		# If there is a job config.
-		#if [ -f ${JOB_CONFIG_FILE} ]
-		#then
-		
-			# Gets the module name.
-			MODULE_DOCKER_IMAGE=`jq -r '.run.docker.image' \
-				< ${CURRENT_MODULE_CURRENT_JOB_CONFIG}`
-			MODULE_DOCKER_IMAGE=`echo ${MODULE_DOCKER_IMAGE} | sed "s/\(.*\):[^:]*/\1/"`
-			
-			# Builds the current module.
-			${DEBUG} && echo "Building module ${MODULE_DOCKER_IMAGE}"
-			docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} .
-			
-			# If push should also be made.
-			if ${PUSH}
+			# If there is a job config.
+			if [ -f ${CURRENT_MODULE_CURRENT_JOB_CONFIG} ]
 			then
 			
-				# Pushes the module.
-				${DEBUG} && echo "Pushing module ${MODULE_DOCKER_IMAGE}"
-				docker ${DOCKER_OPTIONS} push ${MODULE_DOCKER_IMAGE}:${VERSION}
-			
+				# Gets the module name.
+				MODULE_DOCKER_IMAGE=`jq -r '.run.docker.image' \
+					< ${CURRENT_MODULE_CURRENT_JOB_CONFIG}`
+				MODULE_DOCKER_IMAGE=`echo ${MODULE_DOCKER_IMAGE} | sed "s/\(.*\):[^:]*/\1/"`
+				
+				# Builds the current module.
+				${DEBUG} && echo "Building module ${MODULE_DOCKER_IMAGE}"
+				docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} .
+				
+				# If push should also be made.
+				if ${PUSH}
+				then
+				
+					# Pushes the module.
+					${DEBUG} && echo "Pushing module ${MODULE_DOCKER_IMAGE}"
+					docker ${DOCKER_OPTIONS} push ${MODULE_DOCKER_IMAGE}:${VERSION}
+				
+				fi
+				
 			fi
-			
-		#fi
 		done
 		
 		# Goes back to the base dir.

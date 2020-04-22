@@ -209,50 +209,53 @@ do
 			
 		fi
 	
-		# If there is a job config.
+		# For each job config.
 		for CURRENT_MODULE_CURRENT_JOB_CONFIG in ${CURRENT_MODULE_JOB_CONFIG}
 		do
-#		if [ -f ${CURRENT_MODULE_JOB_CONFIG} ]
-#		then
-		
-			# If no profile is set.
-			if [ "${PROFILE_DIRECTORY}" = "" ]
-			then
-				# The temporary job config is the original one.
-				cp ${CURRENT_MODULE_CURRENT_JOB_CONFIG} ${TEMP_JOB_CONFIG_FILE}
-			# If a profile is set.
-			else 
-				# Merges the main file with the profile file into the temporary job file.
-				jq -s '.[0] * .[1]' ${CURRENT_MODULE_CURRENT_JOB_CONFIG} \
-					${PROFILE_DIRECTORY}/${CURRENT_MODULE_CURRENT_JOB_CONFIG} > ${TEMP_JOB_CONFIG_FILE}
-			fi
-
-			# Exports variables to scripts.
-			for ENV_VARIABLE_NAME in `cat ${TEMP_JOB_CONFIG_FILE} | jq -c -r '.run.env | keys[]'`
-			do
-				ENV_VARIABLE_VALUE="`cat ${TEMP_JOB_CONFIG_FILE} | jq -r ".run.env.${ENV_VARIABLE_NAME}"`"
-				${DEBUG} && echo "Exporting variable ${ENV_VARIABLE_NAME}=${ENV_VARIABLE_VALUE} for scripts."
-				export ${ENV_VARIABLE_NAME}="${ENV_VARIABLE_VALUE}"
-			done
-			${DEBUG} && echo "Exporting variable CLI_CONTAINER=${CLI_CONTAINER} for scripts."
-			export CLI_CONTAINER
 			
 			# If there is a job config.
-			if [ -f ${TEMP_JOB_CONFIG_FILE} ]
+			if [ -f ${CURRENT_MODULE_CURRENT_JOB_CONFIG} ]
 			then
 			
-				# Deploys the module.
-				${DEBUG} && echo "${CONTAINER_RUN} dcos_deploy_job ${DEBUG_OPT} \
-					< ${TEMP_JOB_CONFIG_FILE}"
-				${CONTAINER_RUN} dcos_deploy_job ${DEBUG_OPT} \
-					< ${TEMP_JOB_CONFIG_FILE}
-					
-				# Removes the temporary.
-				rm -f ${TEMP_JOB_CONFIG_FILE}
+				# If no profile is set.
+				if [ "${PROFILE_DIRECTORY}" = "" ]
+				then
+					# The temporary job config is the original one.
+					cp ${CURRENT_MODULE_CURRENT_JOB_CONFIG} ${TEMP_JOB_CONFIG_FILE}
+				# If a profile is set.
+				else 
+					# Merges the main file with the profile file into the temporary job file.
+					jq -s '.[0] * .[1]' ${CURRENT_MODULE_CURRENT_JOB_CONFIG} \
+						${PROFILE_DIRECTORY}/${CURRENT_MODULE_CURRENT_JOB_CONFIG} > ${TEMP_JOB_CONFIG_FILE}
+				fi
+	
+				# Exports variables to scripts.
+				for ENV_VARIABLE_NAME in `cat ${TEMP_JOB_CONFIG_FILE} | jq -c -r '.run.env | keys[]'`
+				do
+					ENV_VARIABLE_VALUE="`cat ${TEMP_JOB_CONFIG_FILE} | jq -r ".run.env.${ENV_VARIABLE_NAME}"`"
+					${DEBUG} && echo "Exporting variable ${ENV_VARIABLE_NAME}=${ENV_VARIABLE_VALUE} for scripts."
+					export ${ENV_VARIABLE_NAME}="${ENV_VARIABLE_VALUE}"
+				done
+				${DEBUG} && echo "Exporting variable CLI_CONTAINER=${CLI_CONTAINER} for scripts."
+				export CLI_CONTAINER
 				
+				# If there is a job config.
+				if [ -f ${TEMP_JOB_CONFIG_FILE} ]
+				then
+				
+					# Deploys the module.
+					${DEBUG} && echo "${CONTAINER_RUN} dcos_deploy_job ${DEBUG_OPT} \
+						< ${TEMP_JOB_CONFIG_FILE}"
+					${CONTAINER_RUN} dcos_deploy_job ${DEBUG_OPT} \
+						< ${TEMP_JOB_CONFIG_FILE}
+						
+					# Removes the temporary.
+					rm -f ${TEMP_JOB_CONFIG_FILE}
+					
+				fi
+	
 			fi
-
-#		fi			
+				
 		done
 	
 		# If there is a post deploy script.
