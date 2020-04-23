@@ -126,16 +126,13 @@ do
 			! echo "${EXCLUDE_MODULES}" | grep "^${CURRENT_MODULE_NAME}$")
 	then
 
-		# Goes to the module directory.
-		cd ${CURRENT_MODULE_DIRECTORY}
-
 		# If there is a service config.
-		if [ -f ${SERVICE_CONFIG_FILE} ]
+		if [ -f ${CURRENT_MODULE_DIRECTORY}/${SERVICE_CONFIG_FILE} ]
 		then
 		
 			# Gets the module name.
 			MODULE_DOCKER_IMAGE=`jq -r '.container.docker.image' \
-				< ${SERVICE_CONFIG_FILE}`
+				< ${CURRENT_MODULE_DIRECTORY}/${SERVICE_CONFIG_FILE}`
 			MODULE_DOCKER_IMAGE=`echo ${MODULE_DOCKER_IMAGE} | sed "s/\(.*\):[^:]*/\1/"`
 			
 			# Builds the current module.
@@ -155,7 +152,7 @@ do
 		fi
 		
 		# For each job config.
-		for CURRENT_MODULE_CURRENT_JOB_CONFIG in ${JOB_CONFIG_FILE}
+		for CURRENT_MODULE_CURRENT_JOB_CONFIG in ${CURRENT_MODULE_DIRECTORY}/${JOB_CONFIG_FILE}
 		do
 			# If there is a job config.
 			if [ -f ${CURRENT_MODULE_CURRENT_JOB_CONFIG} ]
@@ -182,9 +179,6 @@ do
 				
 			fi
 		done
-		
-		# Goes back to the base dir.
-		cd ..
 		
 	# If the module should not be built.	
 	else 
