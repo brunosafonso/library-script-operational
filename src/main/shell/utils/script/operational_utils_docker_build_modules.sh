@@ -137,7 +137,7 @@ do
 			
 			# Builds the current module.
 			${DEBUG} && echo "Building module ${MODULE_DOCKER_IMAGE}"
-			docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} .
+			docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} ${CURRENT_MODULE_DIRECTORY}
 			
 			# If push should also be made.
 			if ${PUSH}
@@ -165,7 +165,7 @@ do
 				
 				# Builds the current module.
 				${DEBUG} && echo "Building module ${MODULE_DOCKER_IMAGE}"
-				docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} .
+				docker ${DOCKER_OPTIONS} build ${PULL} -t ${MODULE_DOCKER_IMAGE}:${VERSION} ${CURRENT_MODULE_DIRECTORY}
 				
 				# If push should also be made.
 				if ${PUSH}
