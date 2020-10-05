@@ -107,7 +107,7 @@ set -o nounset
 trap - INT TERM
 
 # Print arguments if on debug mode.
-${DEBUG} && echo "Running 'operational_utils_dcos_marathon_deploy'"
+${DEBUG} && echo "Running 'operational_utils_dcos_deploy_service'"
 ${DEBUG} && echo "CLI_CONTAINER=${CLI_CONTAINER}"
 ${DEBUG} && echo "CONTAINER_RUN=${CONTAINER_RUN}"
 ${DEBUG} && echo "BASE_DIRECTORY=${BASE_DIRECTORY}"
