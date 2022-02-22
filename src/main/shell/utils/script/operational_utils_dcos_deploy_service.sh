@@ -146,9 +146,9 @@ do
 	${DEBUG} && echo "CURRENT_MODULE_POST_DEPLOY_SCRIPT=${CURRENT_MODULE_POST_DEPLOY_SCRIPT}"
 
 	# If the module should be deployed.
-	if ([ -z "${INCLUDE_MODULES}" ] || \
+	if ([ -z "${INCLUDE_MODULES}" ] || [ "${INCLUDE_MODULES}" = "*" ] || \
 			echo "${INCLUDE_MODULES}" | grep "^${CURRENT_MODULE_NAME}$") && 
-		([ -z "${EXCLUDE_MODULES}" ] || \
+		([ -z "${EXCLUDE_MODULES}" ] || [ "${EXCLUDE_MODULES}" != "*" ] || \
 			! echo "${EXCLUDE_MODULES}" | grep "^${CURRENT_MODULE_NAME}$")
 	then
 	
