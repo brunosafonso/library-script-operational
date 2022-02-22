@@ -104,6 +104,8 @@ ${DEBUG} && echo "Running 'dcos-docker-run'"
 ${DEBUG} && echo "BASE_DIRECTORY=${BASE_DIRECTORY}"
 ${DEBUG} && echo "SERVICE_CONFIG_FILE=${SERVICE_CONFIG_FILE}"
 ${DEBUG} && echo "JOB_CONFIG_FILE=${JOB_CONFIG_FILE}"
+${DEBUG} && echo "INCLUDE_MODULES=${INCLUDE_MODULES}"
+${DEBUG} && echo "EXCLUDE_MODULES=${EXCLUDE_MODULES}"
 ${DEBUG} && echo "DOCKER_OPTIONS=${DOCKER_OPTIONS}"
 ${DEBUG} && echo "PUSH=${PUSH}"
 ${DEBUG} && echo "VERSION=${VERSION}"
@@ -120,9 +122,9 @@ do
 	${DEBUG} && echo "CURRENT_MODULE_DIRECTORY=${CURRENT_MODULE_DIRECTORY}"
 	
 	# If the module should be built.
-	if ([ -z "${INCLUDE_MODULES}" ] || \
+	if ([ -z "${INCLUDE_MODULES}" ] || [ "${INCLUDE_MODULES}" = "*" ] || \
 			echo "${INCLUDE_MODULES}" | grep "^${CURRENT_MODULE_NAME}$") && 
-		([ -z "${EXCLUDE_MODULES}" ] || \
+		([ -z "${EXCLUDE_MODULES}" ] || [ "${INCLUDE_MODULES}" != "*" ] || \
 			! echo "${EXCLUDE_MODULES}" | grep "^${CURRENT_MODULE_NAME}$")
 	then
 
