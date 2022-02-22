@@ -123,7 +123,7 @@ do
 	
 	# If the module should be built.
 	if ([ -z "${INCLUDE_MODULES}" ] || [ "${INCLUDE_MODULES}" = "*" ] || \
-			echo "${INCLUDE_MODULES}" | grep "^${CURRENT_MODULE_NAME}$") && 
+			echo "${INCLUDE_MODULES}" | grep "^${CURRENT_MODULE_NAME}$") && \
 		([ -z "${EXCLUDE_MODULES}" ] || [ "${EXCLUDE_MODULES}" != "*" ] || \
 			! echo "${EXCLUDE_MODULES}" | grep "^${CURRENT_MODULE_NAME}$")
 	then
