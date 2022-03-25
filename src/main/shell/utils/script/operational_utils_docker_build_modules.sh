@@ -144,7 +144,7 @@ do
 	${DEBUG} && echo "CURRENT_MODULE_EXCLUDED=${CURRENT_MODULE_EXCLUDED}"
 	# If the module should be built.
 	if ( [ ${INCLUDE_MODULES_EMPTY} = "0" ] || [ "${INCLUDE_ALL_MODULES}" = "0" ] || [ "${CURRENT_MODULE_INCLUDED}" = "0" ] ) && \
-		( [ ${EXCLUDE_MODULES_EMPTY} = "0" ] || [ "${EXCLUDE_ALL_MODULES}" != "0" ] || [ "${CURRENT_MODULE_EXCLUDED}" != "0" ] )
+		( [ ${EXCLUDE_MODULES_EMPTY} = "0" ] || [ "${EXCLUDE_ALL_MODULES}" = "0" ] || [ "${CURRENT_MODULE_EXCLUDED}" != "0" ] )
 	then
 
 		# If there is a service config.
