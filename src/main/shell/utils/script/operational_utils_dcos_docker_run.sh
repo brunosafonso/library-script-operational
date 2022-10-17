@@ -53,7 +53,8 @@ while :; do
 			shift
 			;;
 
-		-i|--image-IMAGE_VERSION)
+		# Add docker image version.
+		-i|--image-version)
 			IMAGE_VERSION=${2}
 			shift
 			;;
