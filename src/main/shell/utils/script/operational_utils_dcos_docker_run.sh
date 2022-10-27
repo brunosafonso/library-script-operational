@@ -12,6 +12,7 @@ PROFILE_DIR=
 ENV_TEMP_FILE=temp-env.properties
 DOCKER_OPTIONS=
 CMD=
+IMAGE_VERSION=
 
 # For each.
 while :; do
@@ -49,6 +50,12 @@ while :; do
 		# Docker options.
 		-o|--docker-options)
 			DOCKER_OPTIONS=${2}
+			shift
+			;;
+
+		# Add docker image version.
+		-i|--image-version)
+			IMAGE_VERSION=${2}
 			shift
 			;;
 
@@ -93,6 +100,11 @@ fi
 # Gets the docker container config.
 CONTAINER_NAME="--name `echo ${SERVICE_CONFIG} | jq -r '.id'`"
 IMAGE_NAME="`echo ${SERVICE_CONFIG} | jq -r '.container.docker.image'`"
+
+if [ "${IMAGE_VERSION}" != "" ]
+then
+	IMAGE_NAME="`echo $IMAGE_NAME | sed "s@:.*@:${IMAGE_VERSION}@g"` || true"
+fi
 
 # Environment variables.
 rm -f ${SERVICE_CONFIG_DIR}/${ENV_TEMP_FILE}
