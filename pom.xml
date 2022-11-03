@@ -10,7 +10,7 @@
 
 	<groupId>org.coldis.library</groupId>
 	<artifactId>script-operational</artifactId>
-	<version>1.0.10-SNAPSHOT</version>
+	<version>1.0.10</version>
 	<packaging>jar</packaging>
 
 	<name>Operational scripts</name>
@@ -24,7 +24,7 @@
 		<url>https://github.com/coldis-org/library-script-operational</url>
 		<connection>scm:git:https://github.com/coldis-org/library-script-operational.git</connection>
 		<developerConnection>scm:git:git@github.com:coldis-org/library-script-operational.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>script-operational-1.0.10</tag>
 	</scm>
 
 	<dependencies />
