@@ -103,7 +103,7 @@ IMAGE_NAME="`echo ${SERVICE_CONFIG} | jq -r '.container.docker.image'`"
 
 if [ "${IMAGE_VERSION}" != "" ]
 then
-	IMAGE_NAME="`echo $IMAGE_NAME | sed "s@:.*@:${IMAGE_VERSION}@g"` || true"
+	IMAGE_NAME="`echo $IMAGE_NAME | sed "s@:.*@:${IMAGE_VERSION}@g"`" || true
 fi
 
 # Environment variables.
