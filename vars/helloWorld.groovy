@@ -1,4 +1,4 @@
-def call(Map config = [:]) {
+def call() {
 	multi_service = ["service","service-history"]
     for (int i = 0; i < modules.size(); i++) {
         sh """
