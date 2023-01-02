@@ -6,4 +6,5 @@ def call(Map config = [:]) {
             echo ${config.dir}
         """
     }
+    feat = "123"
 }
