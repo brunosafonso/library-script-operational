@@ -7,4 +7,5 @@ def call(Map config = [:]) {
         """
     }
     feat = "123"
+    return feat
 }
