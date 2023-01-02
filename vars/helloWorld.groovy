@@ -4,6 +4,7 @@ def call(Map config = [:]) {
         sh """
             echo ${modules[i]}
             echo ${config.dir}
+            echo ${infra_dir}
         """
     }
 }
